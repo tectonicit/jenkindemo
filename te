@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    // environment {
+    //     NODEJS_HOME = tool name: 'NodeJS from Program Files' // Ensure this matches the name you provided in the configuration
+    //     PATH = "${env.NODEJS_HOME}:${env.PATH}"
+    // }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                 git branch: 'main', url: 'https://github.com/tectonicit/jenkindemo.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'npm run build'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    def buildDir = "${env.WORKSPACE}/dist/*"
+                    def deployDir = "C:\\Users\\yasho\\OneDrive\\Desktop\\cppcode\\mywebsite"
+                 //   bat "xcopy  '${buildDir}' '${deployDir}' /E /H /C /Y"
+                   bat "xcopy C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\pipeline2\\dist C:\\Users\\yasho\\OneDrive\\Desktop\\cppcode\\mywebsite /E /H /C /I /Y" 
+                 // bat xcopy "C:\ProgramData\Jenkins\.jenkins\workspace\pipeline2\dist\*" "C:\Users\yasho\OneDrive\Desktop\cppcode\mywebsite" /E /H /C /I
+                }
+            }
+        }
+    }
+
+    triggers {
+        pollSCM('H/2 * * * *') // Poll the repository every 2 minutes
+    }
+}
